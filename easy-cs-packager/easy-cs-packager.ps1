@@ -1,83 +1,132 @@
-﻿# 1. 初始化 (加载所有必要库)
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-$ErrorActionPreference = "SilentlyContinue"
+﻿# 1. 初始化
+Add-Type -AssemblyName System.Windows.Forms, System.Drawing
+$ErrorActionPreference = "Stop" 
 
-# 2. 界面定义 (手动补全所有缺失的标题 Label)
+# 2. 界面布局
 $f = New-Object System.Windows.Forms.Form
-$f.Text = "EazyDev-cs多架构多功能打包工具"; $f.Size = "820,950"; $f.StartPosition = "CenterScreen"; $f.BackColor = "White"
-$uiFont = New-Object System.Drawing.Font("Segoe UI", 9)
-$f.Font = $uiFont
+$f.Text = "EazyDev-cs 打包工具 v27.12 (Security Custom)"; $f.Size = "820,1020"; $f.StartPosition = "CenterScreen"; $f.BackColor = "White"
 
 # --- 路径选择区 ---
-$l1 = New-Object System.Windows.Forms.Label; $l1.Text = "项目根目录:"; $l1.Location = "30,30"; $l1.AutoSize = $true; $f.Controls.Add($l1)
-$tSrc = New-Object System.Windows.Forms.TextBox; $tSrc.Location = "130,27"; $tSrc.Width = 550; $f.Controls.Add($tSrc)
-$bSrc = New-Object System.Windows.Forms.Button; $bSrc.Text = "..."; $bSrc.Location = "700,25"; $bSrc.Size = "50,25"; $f.Controls.Add($bSrc)
+$l1 = New-Object System.Windows.Forms.Label; $l1.Text = "项目根目录:"; $l1.Location = "30,20"; $l1.AutoSize = $true; $f.Controls.Add($l1)
+$tSrc = New-Object System.Windows.Forms.TextBox; $tSrc.Location = "130,17"; $tSrc.Width = 550; $f.Controls.Add($tSrc)
+$bSrc = New-Object System.Windows.Forms.Button; $bSrc.Text = "..."; $bSrc.Location = "700,15"; $bSrc.Size = "50,25"; $f.Controls.Add($bSrc)
 
-$l2 = New-Object System.Windows.Forms.Label; $l2.Text = "输出目录:"; $l2.Location = "30,65"; $l2.AutoSize = $true; $f.Controls.Add($l2)
-$tOut = New-Object System.Windows.Forms.TextBox; $tOut.Location = "130,62"; $tOut.Width = 550; $f.Controls.Add($tOut)
-$bOut = New-Object System.Windows.Forms.Button; $bOut.Text = "..."; $bOut.Location = "700,60"; $bOut.Size = "50,25"; $f.Controls.Add($bOut)
+$l2 = New-Object System.Windows.Forms.Label; $l2.Text = "输出目录:"; $l2.Location = "30,50"; $l2.AutoSize = $true; $f.Controls.Add($l2)
+$tOut = New-Object System.Windows.Forms.TextBox; $tOut.Location = "130,47"; $tOut.Width = 550; $f.Controls.Add($tOut)
+$bOut = New-Object System.Windows.Forms.Button; $bOut.Text = "..."; $bOut.Location = "700,45"; $bOut.Size = "50,25"; $f.Controls.Add($bOut)
 
-# --- 元数据详情区 (补全标签) ---
-$grp = New-Object System.Windows.Forms.GroupBox; $grp.Text = "AppxManifest 应用元数据"; $grp.Location = "30,105"; $grp.Size = "740,100"; $f.Controls.Add($grp)
+# --- 元数据展示区 ---
+$grpMd = New-Object System.Windows.Forms.GroupBox; $grpMd.Text = "AppxManifest 应用元数据"; $grpMd.Location = "30,85"; $grpMd.Size = "740,140"; $f.Controls.Add($grpMd)
+$lm1 = New-Object System.Windows.Forms.Label; $lm1.Text = "包名:"; $lm1.Location = "15,35"; $lm1.AutoSize = $true; $grpMd.Controls.Add($lm1)
+$tN = New-Object System.Windows.Forms.TextBox; $tN.Location = "60,32"; $tN.Width = 200; $grpMd.Controls.Add($tN)
+$lm2 = New-Object System.Windows.Forms.Label; $lm2.Text = "版本:"; $lm2.Location = "280,35"; $lm2.AutoSize = $true; $grpMd.Controls.Add($lm2)
+$tV = New-Object System.Windows.Forms.TextBox; $tV.Location = "320,32"; $tV.Width = 120; $grpMd.Controls.Add($tV)
+$lm3 = New-Object System.Windows.Forms.Label; $lm3.Text = "发布者ID:"; $lm3.Location = "15,68"; $lm3.AutoSize = $true; $grpMd.Controls.Add($lm3)
+$tP = New-Object System.Windows.Forms.TextBox; $tP.Location = "80,65"; $tP.Width = 630; $grpMd.Controls.Add($tP)
 
-$l3 = New-Object System.Windows.Forms.Label; $l3.Text = "包名:"; $l3.Location = "15,35"; $l3.AutoSize = $true; $grp.Controls.Add($l3)
-$tN = New-Object System.Windows.Forms.TextBox; $tN.Location = "60,32"; $tN.Width = 200; $grp.Controls.Add($tN)
+# --- 新增：证书安全设置 ---
+$lm4 = New-Object System.Windows.Forms.Label; $lm4.Text = "证书密码:"; $lm4.Location = "15,103"; $lm4.AutoSize = $true; $grpMd.Controls.Add($lm4)
+$tPass = New-Object System.Windows.Forms.TextBox; $tPass.Location = "80,100"; $tPass.Width = 200; $tPass.Text = "1234"; $tPass.PasswordChar = "*"; $grpMd.Controls.Add($tPass)
 
-$l4 = New-Object System.Windows.Forms.Label; $l4.Text = "版本:"; $l4.Location = "280,35"; $l4.AutoSize = $true; $grp.Controls.Add($l4)
-$tV = New-Object System.Windows.Forms.TextBox; $tV.Location = "320,32"; $tV.Width = 120; $grp.Controls.Add($tV)
+# --- 策略区 ---
+$grpOp = New-Object System.Windows.Forms.GroupBox; $grpOp.Text = "架构选择与策略"; $grpOp.Location = "30,235"; $grpOp.Size = "740,100"; $f.Controls.Add($grpOp)
+$cX64 = New-Object System.Windows.Forms.CheckBox; $cX64.Text = "x64"; $cX64.Location = "20,30"; $cX64.Checked = $true; $grpOp.Controls.Add($cX64)
+$cArm = New-Object System.Windows.Forms.CheckBox; $cArm.Text = "ARM64"; $cArm.Location = "120,30"; $cArm.Checked = $true; $grpOp.Controls.Add($cArm)
+$cX86 = New-Object System.Windows.Forms.CheckBox; $cX86.Text = "x86"; $cX86.Location = "220,30"; $cX86.Checked = $true; $grpOp.Controls.Add($cX86)
+$cTrim = New-Object System.Windows.Forms.CheckBox; $cTrim.Text = "裁剪"; $cTrim.Location = "20,65"; $grpOp.Controls.Add($cTrim)
+$cAOT = New-Object System.Windows.Forms.CheckBox; $cAOT.Text = "AOT"; $cAOT.Location = "130,65"; $grpOp.Controls.Add($cAOT)
+$cZip = New-Object System.Windows.Forms.CheckBox; $cZip.Text = "生成 Zip"; $cZip.Location = "240,65"; $cZip.Checked = $true; $grpOp.Controls.Add($cZip)
+$cMsix = New-Object System.Windows.Forms.CheckBox; $cMsix.Text = "生成 MSIX"; $cMsix.Location = "340,65"; $cMsix.Checked = $true; $grpOp.Controls.Add($cMsix)
+$cBund = New-Object System.Windows.Forms.CheckBox; $cBund.Text = "合成 Bundle"; $cBund.Location = "450,65"; $cBund.Checked = $true; $grpOp.Controls.Add($cBund)
+$cSign = New-Object System.Windows.Forms.CheckBox; $cSign.Text = "PKI 签名"; $cSign.Location = "560,65"; $cSign.Checked = $true; $grpOp.Controls.Add($cSign)
 
-$l5 = New-Object System.Windows.Forms.Label; $l5.Text = "家族名:"; $l5.Location = "15,68"; $l5.AutoSize = $true; $grp.Controls.Add($l5)
-$tF = New-Object System.Windows.Forms.TextBox; $tF.Location = "60,65"; $tF.Width = 650; $tF.ReadOnly = $true; $grp.Controls.Add($tF)
+$log = New-Object System.Windows.Forms.TextBox; $log.Multiline = $true; $log.Location = "30,350"; $log.Size = "740,420"; $log.BackColor = "Black"; $log.ForeColor = "Lime"; $log.ScrollBars = "Vertical"; $f.Controls.Add($log)
+$btnGo = New-Object System.Windows.Forms.Button; $btnGo.Text = "开始执行打包任务"; $btnGo.Location = "30,780"; $btnGo.Size = "740,80"; $btnGo.BackColor = "SkyBlue"; $f.Controls.Add($btnGo)
 
-# --- 架构选择 ---
-$gA = New-Object System.Windows.Forms.GroupBox; $gA.Text = "构建设置"; $gA.Location = "30,215"; $gA.Size = "740,70"; $f.Controls.Add($gA)
-$cX64 = New-Object System.Windows.Forms.CheckBox; $cX64.Text = "x64"; $cX64.Location = "20,30"; $cX64.Checked = $true; $gA.Controls.Add($cX64)
-$cArm = New-Object System.Windows.Forms.CheckBox; $cArm.Text = "ARM64"; $cArm.Location = "120,30"; $cArm.Checked = $true; $gA.Controls.Add($cArm)
-$cX86 = New-Object System.Windows.Forms.CheckBox; $cX86.Text = "x86"; $cX86.Location = "220,30"; $gA.Controls.Add($cX86)
-$cB = New-Object System.Windows.Forms.CheckBox; $cB.Text = "Mapping 合成 Bundle"; $cB.Location = "350,30"; $cB.Checked = $true; $gA.Controls.Add($cB)
+# --- 底部超链接 ---
+$lnk = New-Object System.Windows.Forms.LinkLabel; $lnk.Text = "微软官方文档：如何创建用于包签名的证书"; $lnk.Location = "30,875"; $lnk.AutoSize = $true
+$lnk.Add_Click({ [System.Diagnostics.Process]::Start("https://learn.microsoft.com/zh-cn/windows/msix/package/create-certificate-package-signing") })
+$f.Controls.Add($lnk)
 
-# --- 日志 ---
-$log = New-Object System.Windows.Forms.TextBox; $log.Multiline = $true; $log.Location = "30,300"; $log.Size = "740,480"; $log.BackColor = "Black"; $log.ForeColor = "Lime"; $log.Font = New-Object System.Drawing.Font("Consolas", 9); $log.ScrollBars = "Vertical"; $log.ReadOnly = $true; $f.Controls.Add($log)
+# 3. 辅助函数
+function Invoke-ProcessAsync($cmd, $paramStr, $workDir) {
+    $psi = New-Object System.Diagnostics.ProcessStartInfo -Property @{ FileName = $cmd; Arguments = $paramStr; WorkingDirectory = $workDir; CreateNoWindow = $true; UseShellExecute = $false }
+    $proc = [System.Diagnostics.Process]::Start($psi)
+    while (!$proc.HasExited) { [System.Windows.Forms.Application]::DoEvents(); Start-Sleep -Milliseconds 100 }
+    return $proc.ExitCode
+}
 
-$btnGo = New-Object System.Windows.Forms.Button; $btnGo.Text = "确认并开始任务"; $btnGo.Location = "30,800"; $btnGo.Size = "740,80"; $btnGo.BackColor = "LightBlue"; $f.Controls.Add($btnGo)
+function Get-SDKTool($name) {
+    $sdkArch = if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") { "x64" } else { "arm64" }
+    $tool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\$sdkArch\$name" | Sort-Object -Property FullName -Descending | Select-Object -First 1
+    return $tool.FullName
+}
 
-# 3. 逻辑绑定 (交互逻辑)
-$bSrc.Add_Click({ $d = New-Object System.Windows.Forms.FolderBrowserDialog; if($d.ShowDialog() -eq "OK"){ 
-    $tSrc.Text = $d.SelectedPath; $xmlP = Join-Path $d.SelectedPath "Package.appxmanifest"
-    if(Test-Path $xmlP){ [xml]$x = Get-Content $xmlP; $tN.Text = $x.Package.Identity.Name; $tV.Text = $x.Package.Identity.Version; $tF.Text = "$($tN.Text)_Family" }
-} })
+# 4. 事件绑定
+$bSrc.Add_Click({ 
+    $d = New-Object System.Windows.Forms.FolderBrowserDialog; if($d.ShowDialog() -eq "OK"){ 
+        $tSrc.Text = $d.SelectedPath
+        $xmlP = Join-Path $d.SelectedPath "Package.appxmanifest"
+        if(Test-Path $xmlP){ 
+            [xml]$x = Get-Content $xmlP; $tN.Text = $x.Package.Identity.Name; $tV.Text = $x.Package.Identity.Version; $tP.Text = $x.Package.Identity.Publisher
+        }
+    } 
+})
 $bOut.Add_Click({ $d = New-Object System.Windows.Forms.FolderBrowserDialog; if($d.ShowDialog() -eq "OK"){ $tOut.Text = $d.SelectedPath } })
 
 $btnGo.Add_Click({
-    $log.Clear(); $log.AppendText("开始任务...`r`n")
-    $msixs = @(); $archs = @()
-    if($cX64.Checked){$archs+="x64"} if($cArm.Checked){$archs+="arm64"} if($cX86.Checked){$archs+="x86"}
-    
-    foreach($a in $archs){
-        $log.AppendText("编译 $a...`r`n"); [System.Windows.Forms.Application]::DoEvents()
-        $p = Join-Path $tOut.Text "Pub_$a"
-        $csp = Get-ChildItem $tSrc.Text -Filter "*.csproj" | Select-Object -First 1
-        Start-Process dotnet -ArgumentList "publish `"$($csp.FullName)`" -c Release -r win-$a --self-contained true -o `"$p`" /p:GenerateAppxPackageOnBuild=true /p:AppxPackageSigningEnabled=false" -Wait -NoNewWindow
-        
-        $m = Get-ChildItem (Join-Path $tSrc.Text "bin") -Filter "*.msix" -Recurse | Where-Object {$_.FullName -match $a} | Sort-Object LastWriteTime -Descending | Select-Object -First 1
-        if($m){ $dst = Join-Path $tOut.Text "$($tN.Text)_$($tV.Text)_$a.msix"; Copy-Item $m.FullName -Destination $dst -Force; $msixs += $dst; $log.AppendText("$a MSIX 完成`r`n") }
+    $btnGo.Enabled = $false; $log.Clear(); $msixPaths = @(); $archList = @(); $src = $tSrc.Text; $out = $tOut.Text
+    $userPass = $tPass.Text
+    if(!$src -or !$out){ $btnGo.Enabled = $true; return }
+    if($cX64.Checked){$archList+="x64"} if($cArm.Checked){$archList+="arm64"} if($cX86.Checked){$archList+="x86"}
+
+    # --- PKI 证书逻辑 ---
+    $pfxPath = Join-Path $out "ModernCert.pfx"; $secPass = ConvertTo-SecureString -String $userPass -Force -AsPlainText
+    if($cSign.Checked){
+        try {
+            $cert = New-SelfSignedCertificate -Type Custom -KeyUsage DigitalSignature -CertStoreLocation "Cert:\CurrentUser\My" -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}") -Subject $tP.Text -FriendlyName "EazyDev Auto Sign" -ErrorAction Stop
+            Export-PfxCertificate -cert $cert -FilePath $pfxPath -Password $secPass | Out-Null
+            $log.AppendText("PKI 证书已根据自定义密码生成`r`n")
+        } catch { $log.AppendText("证书生成失败，检查权限。`r`n"); $btnGo.Enabled = $true; return }
     }
 
-    if($cB.Checked -and $msixs.Count -gt 1){
-        $log.AppendText("合成 Bundle...`r`n")
-        $map = Join-Path $tOut.Text "bundle_mapping.txt"; "[Files]" | Out-File $map -Encoding utf8
-        foreach($m in $msixs){ "`"$m`" `"$(Split-Path $m -Leaf)`"" | Out-File $map -Append -Encoding utf8 }
+    foreach($arch in $archList){
+        $log.AppendText(">>> 正在处理 $arch...`r`n"); [System.Windows.Forms.Application]::DoEvents()
+        $pDir = Join-Path $out "Pub_$arch"; New-Item -ItemType Directory -Path $pDir -Force | Out-Null
         
-        $sk = switch ($env:PROCESSOR_ARCHITECTURE) { "AMD64" {"x64"} "ARM64" {"arm64"} default {"x64"} }
-        $exe = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\$sk\makeappx.exe" | Sort-Object FullName -Descending | Select-Object -First 1
-        if($exe){ 
-            $bp = Join-Path $tOut.Text "$($tN.Text)_$($tV.Text)_Bundle.msixbundle"
-            & $exe.FullName bundle /f $map /p $bp /o | Out-Null
-            $log.AppendText("Bundle 成功: $bp`r`n") 
+        Invoke-ProcessAsync "dotnet" "publish -c Release -r win-$arch --self-contained true -o `"$pDir`"" $src
+
+        if($cMsix.Checked){
+            Invoke-ProcessAsync "dotnet" "publish -c Release -r win-$arch /p:GenerateAppxPackageOnBuild=true" $src
+            $rawMsix = Get-ChildItem (Join-Path $src "bin") -Filter "*.msix" -Recurse | Where-Object {$_.FullName -match $arch} | Sort-Object -Property LastWriteTime -Descending | Select-Object -First 1
+            if($rawMsix){
+                $finalMsix = Join-Path $out "$($tN.Text)_$arch.msix"
+                Copy-Item $rawMsix.FullName -Destination $finalMsix -Force
+                if($cSign.Checked){ 
+                    $st = Get-SDKTool "signtool.exe"
+                    & $st sign /fd SHA256 /f $pfxPath /p $userPass /t http://timestamp.digicert.com $finalMsix | Out-Null
+                    $log.AppendText("$arch 签名完成`r`n")
+                }
+                $msixPaths += $finalMsix
+            }
+        }
+        if($cZip.Checked){
+            Compress-Archive -Path "$pDir\*" -DestinationPath "$out\$($tN.Text)_$arch.zip" -Force
+            $log.AppendText("$arch Zip 完成`r`n")
         }
     }
-    [System.Windows.Forms.MessageBox]::Show("完成！")
+
+    if($cBund.Checked -and $msixPaths.Count -gt 1){
+        $log.AppendText(">>> 正在合成 Bundle...`r`n")
+        $map = Join-Path $out "b_map.txt"; "[Files]" | Out-File $map -Encoding utf8
+        foreach($p in $msixPaths){ "`"$p`" `"$(Split-Path $p -Leaf)`"" | Out-File $map -Append -Encoding utf8 }
+        $bundle = Join-Path $out "$($tN.Text)_Full.msixbundle"
+        $ma = Get-SDKTool "makeappx.exe"; & $ma bundle /f $map /p $bundle /o | Out-Null
+        if($cSign.Checked){ $st = Get-SDKTool "signtool.exe"; & $st sign /fd SHA256 /f $pfxPath /p $userPass /t http://timestamp.digicert.com $bundle | Out-Null }
+        $log.AppendText("所有任务已完成!`r`n")
+    }
+    $btnGo.Enabled = $true
+    [System.Windows.Forms.MessageBox]::Show("执行完毕。")
 })
 
 $f.ShowDialog()
