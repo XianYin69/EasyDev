@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 try {
     # 2. 界面布局
     $f = New-Object System.Windows.Forms.Form
-    $f.Text = "EazyDev-cs 打包工具 v27.12 (Security Custom)"; $f.Size = "820,1050"; $f.StartPosition = "CenterScreen"; $f.BackColor = "White"
+    $f.Text = "EazyDev-cs 打包工具"; $f.Size = "820,1050"; $f.StartPosition = "CenterScreen"; $f.BackColor = "White"
 
     # --- 路径选择区 ---
     $l1 = New-Object System.Windows.Forms.Label; $l1.Text = "项目根目录:"; $l1.Location = "30,20"; $l1.AutoSize = $true; $f.Controls.Add($l1)
@@ -17,12 +17,12 @@ try {
     $bOut = New-Object System.Windows.Forms.Button; $bOut.Text = "..."; $bOut.Location = "700,45"; $bOut.Size = "50,25"; $f.Controls.Add($bOut)
 
     # --- 元数据展示区 ---
-    $grpMd = New-Object System.Windows.Forms.GroupBox; $grpMd.Text = "AppxManifest 应用元数据"; $grpMd.Location = "30,85"; $grpMd.Size = "740,140"; $f.Controls.Add($grpMd)
+    $grpMd = New-Object System.Windows.Forms.GroupBox; $grpMd.Text = ".AppxManifest 项目元数据"; $grpMd.Location = "30,85"; $grpMd.Size = "740,140"; $f.Controls.Add($grpMd)
     $lm1 = New-Object System.Windows.Forms.Label; $lm1.Text = "包名:"; $lm1.Location = "15,35"; $lm1.AutoSize = $true; $grpMd.Controls.Add($lm1)
     $tN = New-Object System.Windows.Forms.TextBox; $tN.Location = "60,32"; $tN.Width = 200; $grpMd.Controls.Add($tN)
     $lm2 = New-Object System.Windows.Forms.Label; $lm2.Text = "版本:"; $lm2.Location = "280,35"; $lm2.AutoSize = $true; $grpMd.Controls.Add($lm2)
     $tV = New-Object System.Windows.Forms.TextBox; $tV.Location = "320,32"; $tV.Width = 120; $grpMd.Controls.Add($tV)
-    $lm3 = New-Object System.Windows.Forms.Label; $lm3.Text = "发布者ID:"; $lm3.Location = "15,68"; $lm3.AutoSize = $true; $grpMd.Controls.Add($lm3)
+    $lm3 = New-Object System.Windows.Forms.Label; $lm3.Text = "发布者:"; $lm3.Location = "15,68"; $lm3.AutoSize = $true; $grpMd.Controls.Add($lm3)
     $tP = New-Object System.Windows.Forms.TextBox; $tP.Location = "80,65"; $tP.Width = 630; $grpMd.Controls.Add($tP)
 
     $lm4 = New-Object System.Windows.Forms.Label; $lm4.Text = "证书密码:"; $lm4.Location = "15,103"; $lm4.AutoSize = $true; $grpMd.Controls.Add($lm4)
@@ -31,8 +31,8 @@ try {
     # --- 策略区 ---
     $grpOp = New-Object System.Windows.Forms.GroupBox; $grpOp.Text = "架构选择与策略"; $grpOp.Location = "30,235"; $grpOp.Size = "740,100"; $f.Controls.Add($grpOp)
     $cX64 = New-Object System.Windows.Forms.CheckBox; $cX64.Text = "x64"; $cX64.Location = "20,30"; $cX64.Checked = $true; $grpOp.Controls.Add($cX64)
-    $cArm = New-Object System.Windows.Forms.CheckBox; $cArm.Text = "ARM64"; $cArm.Location = "120,30"; $cArm.Checked = $true; $grpOp.Controls.Add($cArm)
-    $cX86 = New-Object System.Windows.Forms.CheckBox; $cX86.Text = "x86"; $cX86.Location = "220,30"; $cX86.Checked = $true; $grpOp.Controls.Add($cX86)
+    $cArm = New-Object System.Windows.Forms.CheckBox; $cArm.Text = "ARM64"; $cArm.Location = "130,30"; $cArm.Checked = $true; $grpOp.Controls.Add($cArm)
+    $cX86 = New-Object System.Windows.Forms.CheckBox; $cX86.Text = "x86"; $cX86.Location = "240,30"; $cX86.Checked = $true; $grpOp.Controls.Add($cX86)
     $cTrim = New-Object System.Windows.Forms.CheckBox; $cTrim.Text = "裁剪"; $cTrim.Location = "20,65"; $grpOp.Controls.Add($cTrim)
     $cAOT = New-Object System.Windows.Forms.CheckBox; $cAOT.Text = "AOT"; $cAOT.Location = "130,65"; $grpOp.Controls.Add($cAOT)
     $cZip = New-Object System.Windows.Forms.CheckBox; $cZip.Text = "生成 Zip"; $cZip.Location = "240,65"; $cZip.Checked = $true; $grpOp.Controls.Add($cZip)
@@ -45,10 +45,10 @@ try {
     # --- 进度条 ---
     $prog = New-Object System.Windows.Forms.ProgressBar; $prog.Location = "30,740"; $prog.Size = "740,30"; $prog.Minimum = 0; $prog.Maximum = 100; $f.Controls.Add($prog)
 
-    $btnGo = New-Object System.Windows.Forms.Button; $btnGo.Text = "开始执行打包任务"; $btnGo.Location = "30,780"; $btnGo.Size = "740,80"; $btnGo.BackColor = "SkyBlue"; $f.Controls.Add($btnGo)
+    $btnGo = New-Object System.Windows.Forms.Button; $btnGo.Text = "开始任务"; $btnGo.Location = "250,780"; $btnGo.Size = "340,80"; $btnGo.BackColor = "SkyBlue"; $f.Controls.Add($btnGo)
 
     # --- 底部超链接 (恢复) ---
-    $lnk = New-Object System.Windows.Forms.LinkLabel; $lnk.Text = "微软官方文档：如何创建用于包签名的证书"; $lnk.Location = "30,875"; $lnk.AutoSize = $true
+    $lnk = New-Object System.Windows.Forms.LinkLabel; $lnk.Text = "相关链接：如何创建用于包签名的证书"; $lnk.Location = "30,875"; $lnk.AutoSize = $true
     $lnk.Add_Click({ [System.Diagnostics.Process]::Start("https://learn.microsoft.com/zh-cn/windows/msix/package/create-certificate-package-signing") })
     $f.Controls.Add($lnk)
 
@@ -62,7 +62,7 @@ try {
 
     function Get-SDKTool($name) {
         $sdkArch = if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") { "x64" } else { "arm64" }
-        $tool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\*\$sdkArch\$name" -ErrorAction SilentlyContinue | Sort-Object -Property FullName -Descending | Select-Object -First 1
+        $tool = Get-ChildItem "C:\Program Files (x86)\Windows Kits\*\bin\*\$sdkArch\$name" -ErrorAction SilentlyContinue | Sort-Object -Property FullName -Descending | Select-Object -First 1
         if (!$tool) { throw "找不到 SDK 工具: $name。请确认是否安装了 Windows SDK。" }
         return $tool.FullName
     }
@@ -106,7 +106,7 @@ try {
                 $currentStep++
                 $cert = New-SelfSignedCertificate -Type Custom -KeyUsage DigitalSignature -CertStoreLocation "Cert:\CurrentUser\My" -TextExtension @("2.5.29.37={text}1.3.6.1.5.5.7.3.3", "2.5.29.19={text}") -Subject $tP.Text -FriendlyName "EazyDev Auto Sign" -ErrorAction Stop
                 Export-PfxCertificate -cert $cert -FilePath $pfxPath -Password $secPass | Out-Null
-                $log.AppendText("PKI 证书已生成`r`n")
+                $log.AppendText("证书已生成`r`n")
                 $prog.Value = [int][math]::Min(100, ($currentStep / $totalSteps * 100))
             }
 
